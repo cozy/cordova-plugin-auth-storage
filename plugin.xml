@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- TODO comments, header -->
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android" id="io.cozy.plugins.authstorage" version="1.0.0">
+	<name>Auth Storage</name>
+	<description>
+		Stores auth data into keychain (iOS)
+	</description>
+
+	<license>AGPL v3</license>
+	<keywords>cordova, plugin, library, android, ios</keywords>
+	<repo>https://github.com/maestun/cordova-plugin-auth-storage.git</repo>
+	<issue>https://github.com/maestun/cordova-plugin-auth-storage.git/issues</issue>
+
+	<js-module src="www/AuthStorage.js" name="AuthStorage">
+		<clobbers target="cordova.plugins.authStorage" />
+	</js-module>
+
+	<!-- iOS -->
+	<platform name="ios">
+		<config-file target="config.xml" parent="/*">
+			<feature name="AuthStorage">
+				<param name="ios-package" value="AuthStorage"/>
+			</feature>
+		</config-file>
+		<header-file src="src/ios/AuthStorage.h"/>
+		<source-file src="src/ios/AuthStorage.m"/>
+	</platform>
+
+	<!-- Android -->
+	<platform name="android">
+		<config-file target="res/xml/config.xml" parent="/*">
+			<feature name="AuthStorage">
+				<param name="android-package" value="io.cozy.plugins.authstorage.AuthStorage"/>
+			</feature>
+		</config-file>
+		<source-file src="src/android/io/cozy/plugins/authstorage/AuthStorage.java" target-dir="src/io/cozy/plugins/authstorage/"/>
+	</platform>
+</plugin>
