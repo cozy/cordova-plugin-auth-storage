@@ -1,7 +1,5 @@
 
 #import "AuthStorage.h"
-
-#import <Photos/Photos.h>
 #import <MobileCoreServices/MobileCoreServices.h>
 
 static NSString * PERMISSION_ERROR = @"Permission Denial: This application is not allowed to access Photo data.";
@@ -12,7 +10,6 @@ static NSString * PERMISSION_ERROR = @"Permission Denial: This application is no
     NSURL * mLocalTempURL;
     NSDictionary * mReceivedData;
 }
-
 @end
 
 

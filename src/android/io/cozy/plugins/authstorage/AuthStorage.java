@@ -55,7 +55,17 @@ public class AuthStorage extends CordovaPlugin {
     @Override
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
 
-        if ("isAuthorized".equals(action)) {
+        if ("storeData".equals(action)) {
+            
+            try {  
+                ufp.mJSONObject = args.getJSONObject(0);
+                        ufp.mCallbackContext = callbackContext;
+                        new UploadFileTask().execute(ufp);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        callbackContext.error(e.getMessage());
+                    }
+
             this.isAuthorized(callbackContext);
             return true;
         } else if ("requestReadAuthorization".equals(action)) {
