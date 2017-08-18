@@ -4,8 +4,5 @@
 @interface AuthStorage : CDVPlugin <NSURLSessionDelegate, NSURLSessionTaskDelegate, NSURLSessionDataDelegate>
 
 - (void)pluginInitialize;
-- (void)isAuthorized:(CDVInvokedUrlCommand *)command;
-- (void)listItems:(CDVInvokedUrlCommand *)command;
-- (void)uploadItem:(CDVInvokedUrlCommand *)command;
-- (void)requestReadAuthorization:(CDVInvokedUrlCommand *)command;
+- (void)storeData:(CDVInvokedUrlCommand *)command;
 @end
