@@ -2,7 +2,10 @@
 #import "AuthStorage.h"
 #import <MobileCoreServices/MobileCoreServices.h>
 #import <Security/Security.h>
-#import "SAMKeychain.h"
+#import <SAMKeychain/SAMKeychain.h>
+
+#define KEYCHAIN_NAME       @"io.cozy.drive.mobile"
+
 
 @implementation AuthStorage
  
@@ -23,23 +26,18 @@
     
     NSString * url = command.arguments[0];
     NSString * token = command.arguments[1];
-    token = [@"Bearer " stringByAppendingString:token];
     
-    // store this in keychain
-    NSData * url_data = [url dataUsingEncoding:NSUTF8StringEncoding];
-    NSData * token_data = [token dataUsingEncoding:NSUTF8StringEncoding];
-    NSDictionary * keychain_query = [NSDictionary dictionaryWithObjects:@[(NSString *)kSecClass, (NSString *)kSecClassGenericPassword, (NSString *)kSecAttrService, (NSString *)kSecValueData]
-                                                                forKeys:@[(NSString *)kSecClassGenericPassword, url_data, @"io.cozy.drive.mobile", token_data]];
-    SecItemDelete((__bridge CFDictionaryRef)keychain_query);
-    SecItemAdd((__bridge CFDictionaryRef)keychain_query, nil);
-
-    
-    
-    
-    [SAMKeychain deletePasswordForService:@"io.cozy.drive.mobile" account:url];
-    BOOL result = [SAMKeychain setPassword:token forService:@"io.cozy.drive.mobile" account:url];
+    BOOL result = [SAMKeychain setPassword:token forService:KEYCHAIN_NAME account:url];
     [self returnResult:result payload:[NSDictionary dictionaryWithObject:result ? @"ok" : @"error" forKey:@"result"] command:command];
 }
 
 
+- (void)removeData:(CDVInvokedUrlCommand *)command {
+
+    NSArray * accounts = [SAMKeychain accountsForService:KEYCHAIN_NAME];
+    for(NSString * account in accounts) {
+        [SAMKeychain deletePasswordForService:KEYCHAIN_NAME account:account];
+    }
+    [self returnResult:YES payload:[NSDictionary dictionaryWithObject:@"ok" forKey:@"result"] command:command];
+}
 @end

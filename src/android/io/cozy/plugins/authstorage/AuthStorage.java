@@ -1,12 +1,7 @@
 package io.cozy.plugins.authstorage;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.os.AsyncTask;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.webkit.MimeTypeMap;
+import android.content.SharedPreferences;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaInterface;
@@ -15,35 +10,12 @@ import org.apache.cordova.CordovaWebView;
 import org.apache.cordova.PluginResult;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.Authenticator;
-import java.net.HttpURLConnection;
-import java.net.PasswordAuthentication;
-import java.net.URL;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Iterator;
-import java.util.List;
-
-import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import io.cozy.drive.mobile.R;
 
 public class AuthStorage extends CordovaPlugin {
 
     private Context mContext;
-    private static final String PERMISSION_ERROR = "Permission Denial: This application is not allowed to access Photo data.";
-    private SimpleDateFormat mDateFormatter = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
-
 
     @Override
     public void initialize(CordovaInterface cordova, CordovaWebView webView) {
@@ -55,8 +27,52 @@ public class AuthStorage extends CordovaPlugin {
     @Override
     public boolean execute(String action, final JSONArray args, final CallbackContext callbackContext) throws JSONException {
         if ("storeData".equals(action)) {
-            callbackContext.success();
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    try {
+                        storeData(callbackContext, args.getString(0), args.getString(1));
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        callbackContext.error(e.getMessage());
+                    }
+                }
+            });
             return true;
         }
+        else if ("removeData".equals(action)) {
+            cordova.getThreadPool().execute(new Runnable() {
+                public void run() {
+                    removeData(callbackContext);
+                }
+            });
+            return true;
+        }
+        return false;
     }
+
+
+    private void storeData(CallbackContext aCallbackContext, String aURL, String aToken) {
+
+        // TODO encrypt !!
+        SharedPreferences sp = mContext.getSharedPreferences(mContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.putString("cozy_url", aURL);
+        editor.putString("cozy_token", aToken);
+        editor.commit();
+        PluginResult pr = new PluginResult(PluginResult.Status.OK, "ok");
+        aCallbackContext.sendPluginResult(pr);
+    }
+
+
+    private void removeData(CallbackContext aCallbackContext) {
+
+        SharedPreferences sp = mContext.getSharedPreferences(mContext.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sp.edit();
+        editor.remove("cozy_url");
+        editor.remove("cozy_token");
+        editor.commit();
+        PluginResult pr = new PluginResult(PluginResult.Status.OK, "ok");
+        aCallbackContext.sendPluginResult(pr);
+    }
+
 }

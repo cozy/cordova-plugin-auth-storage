@@ -5,4 +5,5 @@
 
 - (void)pluginInitialize;
 - (void)storeData:(CDVInvokedUrlCommand *)command;
+- (void)removeData:(CDVInvokedUrlCommand *)command;
 @end
